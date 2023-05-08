@@ -1,17 +1,43 @@
 #! /usr/bin/env node
 
+import {
+  createCommunityPluginsCSV,
+  filterPluginVersions,
+} from "./utils/csvPluginsWriter";
 const fs = require("fs");
 const path = require("path");
 const figlet = require("figlet");
+const axios = require("axios").default;
 const { Command } = require("commander");
+const plugins = require("../src/mocks/plugins.json");
 
 const program = new Command();
 
 console.log(figlet.textSync("Lotus CLI"));
 
 program
+  .name("string-util")
+  .description("CLI to some JavaScript string utilities")
+  .version("0.1.0");
+
+program
+  .command("community")
+  .description(
+    "Get a CSV with the Moodle Community plugins and their latest version"
+  )
+  .action((str: any) => {
+    getCommunityPlugins();
+  });
+
+program
   .version("1.0.0")
-  .description("An example CLI for managing a directory")
+  .description(
+    "Lotus CLI is a tool created to manage Moodle plugins information"
+  )
+  .option(
+    "-cpl, --communityplugins <value>",
+    "<filename> Obtain Moodle directory plugins in a CSV file"
+  )
   .option("-l, --ls  [value]", "List directory contents")
   .option("-m, --mkdir <value>", "Create a directory")
   .option("-t, --touch <value>", "Create a file")
@@ -44,6 +70,19 @@ function createDir(filepath: string) {
 function createFile(filepath: string) {
   fs.openSync(filepath, "w");
   console.log("An empty file has been created");
+}
+
+async function getCommunityPlugins() {
+  try {
+    console.log("Fetching Moodle directory plugins...");
+    let response = await axios.get(
+      "https://download.moodle.org/api/1.3/pluglist.php"
+    );
+    const transformedPlugins = filterPluginVersions(response.data.plugins);
+    createCommunityPluginsCSV(transformedPlugins, __dirname);
+  } catch (error) {
+    console.error("Error occurred fetching plugins", error);
+  }
 }
 
 if (options.ls) {

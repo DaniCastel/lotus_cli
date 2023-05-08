@@ -1,15 +1,16 @@
 #! /usr/bin/env node
 
 import {
-  createCommunityPluginsCSV,
   filterPluginVersions,
+  createCommunityPluginsCSV,
 } from "./utils/csvPluginsWriter";
+
+require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const figlet = require("figlet");
 const axios = require("axios").default;
 const { Command } = require("commander");
-const plugins = require("../src/mocks/plugins.json");
 
 const program = new Command();
 
@@ -25,7 +26,7 @@ program
   .description(
     "Get a CSV with the Moodle Community plugins and their latest version"
   )
-  .action((str: any) => {
+  .action(() => {
     getCommunityPlugins();
   });
 
@@ -33,10 +34,6 @@ program
   .version("1.0.0")
   .description(
     "Lotus CLI is a tool created to manage Moodle plugins information"
-  )
-  .option(
-    "-cpl, --communityplugins <value>",
-    "<filename> Obtain Moodle directory plugins in a CSV file"
   )
   .option("-l, --ls  [value]", "List directory contents")
   .option("-m, --mkdir <value>", "Create a directory")
@@ -76,7 +73,7 @@ async function getCommunityPlugins() {
   try {
     console.log("Fetching Moodle directory plugins...");
     let response = await axios.get(
-      "https://download.moodle.org/api/1.3/pluglist.php"
+      `${process.env.MOODLE_API}/1.3/pluglist.php`
     );
     const transformedPlugins = filterPluginVersions(response.data.plugins);
     createCommunityPluginsCSV(transformedPlugins, __dirname);

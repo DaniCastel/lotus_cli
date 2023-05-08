@@ -1,7 +1,7 @@
 import path from "path";
-const _ = require("underscore");
 import { ICommunityPlugin } from "../types/CommunityPlugin";
 
+const _ = require("underscore");
 const csvWriter = require("csv-writer");
 
 export function filterPluginVersions(plugins: ICommunityPlugin[]) {

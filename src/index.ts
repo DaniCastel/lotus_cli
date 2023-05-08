@@ -72,9 +72,7 @@ function createFile(filepath: string) {
 async function getCommunityPlugins() {
   try {
     console.log("Fetching Moodle directory plugins...");
-    let response = await axios.get(
-      `${process.env.MOODLE_API}/1.3/pluglist.php`
-    );
+    let response = await axios.get(`${process.env.MOODLE_API}/pluglist.php`);
     const transformedPlugins = filterPluginVersions(response.data.plugins);
     createCommunityPluginsCSV(transformedPlugins, __dirname);
   } catch (error) {

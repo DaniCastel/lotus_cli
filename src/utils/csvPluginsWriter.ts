@@ -1,12 +1,12 @@
 import path from "path";
-import { ICommunityPlugin } from "../types/CommunityPlugin";
+import { ICommunityPlugin, IVersion } from "../types/CommunityPlugin";
 
 const _ = require("underscore");
 const csvWriter = require("csv-writer");
 
 export function filterPluginVersions(plugins: ICommunityPlugin[]) {
   const transformedPlugins = plugins.map((plugin) => {
-    const lastVersion = plugin.versions.pop();
+    const lastVersion = plugin.versions.sort(compareVersion).pop();
 
     const supportedMoodles = _.pluck(
       lastVersion?.supportedmoodles,
@@ -24,6 +24,16 @@ export function filterPluginVersions(plugins: ICommunityPlugin[]) {
     return plugin;
   });
   return transformedPlugins;
+}
+
+function compareVersion(a: IVersion, b: IVersion) {
+  if (a.version < b.version) {
+    return -1;
+  }
+  if (a.version > b.version) {
+    return 1;
+  }
+  return 0;
 }
 
 export function createCommunityPluginsCSV(

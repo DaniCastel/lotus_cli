@@ -1,20 +1,20 @@
-export interface ICommunityPlugin {
+export type TCommunityPlugin = {
   id: number;
   name: string;
   component: string;
   source: string;
   doc: string;
   bugs: string;
-  discussion: any;
+  discussion: string | null;
   lastVersion?: string;
   lastRelease?: string;
   lastReleaseDate?: string;
   supportedMoodles?: string;
   timelastreleased: number;
-  versions: IVersion[];
-}
+  versions: TVersion[];
+};
 
-export interface IVersion {
+export type TVersion = {
   id: number;
   version: string;
   release: string;
@@ -22,15 +22,15 @@ export interface IVersion {
   downloadurl: string;
   downloadmd5: string;
   vcssystem: string;
-  vcssystemother: any;
+  vcssystemother: string | null;
   vcsrepositoryurl: string;
-  vcsbranch: any;
+  vcsbranch: string | null;
   vcstag?: string;
   timecreated: number;
-  supportedmoodles: ISupportedMoodle[];
-}
+  supportedmoodles: TSupportedMoodle[];
+};
 
-export interface ISupportedMoodle {
+export type TSupportedMoodle = {
   version: number;
   release: string;
-}
+};

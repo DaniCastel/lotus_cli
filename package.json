@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "npx tsc",
+    "lint": "eslint -f unix \"src/**/*.{ts,tsx}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -21,7 +22,14 @@
     "underscore": "^1.13.6"
   },
   "devDependencies": {
+    "@types/figlet": "^1.5.6",
     "@types/node": "^20.1.0",
+    "@types/underscore": "^1.11.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "eslint": "^8.40.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "typedoc": "^0.24.7",
     "typescript": "^5.0.4"
   }
 }

@@ -1,34 +1,19 @@
 #! /usr/bin/env node
+import fs from "fs";
+import path from "path";
+import figlet from "figlet";
 
-import {
-  filterPluginVersions,
-  createCommunityPluginsCSV,
-} from "./utils/csvPluginsWriter";
+import dotenv from "dotenv";
+import { Command } from "commander";
 
-require("dotenv").config();
-const fs = require("fs");
-const path = require("path");
-const figlet = require("figlet");
-const axios = require("axios").default;
-const { Command } = require("commander");
-
+dotenv.config();
 const program = new Command();
-
 console.log(figlet.textSync("Lotus CLI"));
 
 program
   .name("string-util")
   .description("CLI to some JavaScript string utilities")
   .version("0.1.0");
-
-program
-  .command("community")
-  .description(
-    "Get a CSV with the Moodle Community plugins and their latest version"
-  )
-  .action(() => {
-    getCommunityPlugins();
-  });
 
 program
   .version("1.0.0")
@@ -40,13 +25,15 @@ program
   .option("-t, --touch <value>", "Create a file")
   .parse(process.argv);
 
+export { program };
+
 const options = program.opts();
 
 async function listDirContents(filepath: string) {
   try {
     const files = await fs.promises.readdir(filepath);
     const detailedFilesPromises = files.map(async (file: string) => {
-      let fileDetails = await fs.promises.lstat(path.resolve(filepath, file));
+      const fileDetails = await fs.promises.lstat(path.resolve(filepath, file));
       const { size, birthtime } = fileDetails;
       return { filename: file, "size(KB)": size, created_at: birthtime };
     });
@@ -67,17 +54,6 @@ function createDir(filepath: string) {
 function createFile(filepath: string) {
   fs.openSync(filepath, "w");
   console.log("An empty file has been created");
-}
-
-async function getCommunityPlugins() {
-  try {
-    console.log("Fetching Moodle directory plugins...");
-    let response = await axios.get(`${process.env.MOODLE_API}/pluglist.php`);
-    const transformedPlugins = filterPluginVersions(response.data.plugins);
-    createCommunityPluginsCSV(transformedPlugins, __dirname);
-  } catch (error) {
-    console.error("Error occurred fetching plugins", error);
-  }
 }
 
 if (options.ls) {

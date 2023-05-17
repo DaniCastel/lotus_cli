@@ -1,9 +1,26 @@
 import path from "path";
 import axios from "axios";
-import _ from "underscore";
-import { TCommunityPlugin, TVersion } from "../../types/CommunityPlugin";
+import { pluck } from "underscore";
+import { Command } from "commander";
 import { createObjectCsvWriter } from "csv-writer";
 
+import { TCommunityPlugin, TVersion } from "../../types/CommunityPlugin";
+
+export function registerCommand(program: Command) {
+  program
+    .command("community")
+    .description(
+      "Get a CSV with the Moodle Community plugins and their latest version"
+    )
+    .action(() => {
+      getCommunityPlugins();
+    });
+}
+
+/**
+ * Action triggered by community command, it request moodle directory plugin list from moodle
+ *
+ */
 export async function getCommunityPlugins() {
   try {
     console.log("Fetching Moodle directory plugins...");
@@ -15,6 +32,12 @@ export async function getCommunityPlugins() {
   }
 }
 
+/**
+ * Create a CSV file and save it in a directory
+ *
+ * @param plugins - Community plugin
+ * @param plugins - directory path
+ */
 export function createCommunityPluginsCSV(
   plugins: TCommunityPlugin[],
   dirname: string
@@ -48,7 +71,7 @@ export function addLastVersionToPlugins(plugins: TCommunityPlugin[]) {
   const transformedPlugins = plugins.map((plugin) => {
     const lastVersion = plugin.versions.sort(compareVersion).pop();
 
-    const supportedMoodles = _.pluck(
+    const supportedMoodles = pluck(
       lastVersion?.supportedmoodles ?? [],
       "release"
     ).join(",");
@@ -66,11 +89,18 @@ export function addLastVersionToPlugins(plugins: TCommunityPlugin[]) {
   return transformedPlugins;
 }
 
-function compareVersion(a: TVersion, b: TVersion) {
-  if (a.version < b.version) {
+/**
+ * Compare plugin version strings, useful to sort array of version objects
+ *
+ * @param pluginVersion1 plugin version object
+ * @param pluginVersion1 plugin version object
+ * @returns -1 if first plugin version is lower than second plugin version, 1 if plugin version is higher than second plugin version, 0 if versions are the same
+ */
+function compareVersion(pluginVersion1: TVersion, pluginVersion2: TVersion) {
+  if (pluginVersion1.version < pluginVersion2.version) {
     return -1;
   }
-  if (a.version > b.version) {
+  if (pluginVersion1.version > pluginVersion2.version) {
     return 1;
   }
   return 0;
